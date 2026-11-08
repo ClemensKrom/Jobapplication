@@ -14,8 +14,10 @@ remote, newest first) and links to the Dutch boards instead.
 
 ## Start it
 
-The easy way: copy **JobRadar.exe** (in the `dist` folder) to any folder you
-like, for example `Documents\JobRadar`, and double-click it. A black window
+The easy way: download **JobRadar-1.0-windows.zip** from the latest release at
+https://github.com/ClemensKrom/Jobapplication/releases/latest, unzip it into a
+folder of its own, for example `Documents\JobRadar`, and double-click
+**JobRadar.exe**. A black window
 opens and your browser opens JobRadar at http://127.0.0.1:8765/. Keep the
 black window open while you use JobRadar; close it to stop. Nothing needs to
 be installed. The exe creates its files (settings, saved jobs, watchlist,
