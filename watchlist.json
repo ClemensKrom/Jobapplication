@@ -1,0 +1,60 @@
+{
+ "companies": [
+  {
+   "id": "greenhouse:catawiki",
+   "ats": "greenhouse",
+   "slug": "catawiki",
+   "name": "Catawiki",
+   "url": "https://www.catawiki.com/en/careers",
+   "added": "2026-11-08T17:00:00Z"
+  },
+  {
+   "id": "recruitee:bunq",
+   "ats": "recruitee",
+   "slug": "bunq",
+   "name": "bunq",
+   "url": "https://careers.bunq.com",
+   "added": "2026-11-08T17:00:00Z"
+  },
+  {
+   "id": "ashby:polarsteps",
+   "ats": "ashby",
+   "slug": "polarsteps",
+   "name": "Polarsteps",
+   "url": "https://jobs.ashbyhq.com/polarsteps",
+   "added": "2026-11-08T17:00:00Z"
+  },
+  {
+   "id": "teamtailor:jobs.sendcloud.com",
+   "ats": "teamtailor",
+   "slug": "jobs.sendcloud.com",
+   "name": "Sendcloud",
+   "url": "https://www.sendcloud.com/careers",
+   "added": "2026-11-08T16:03:13Z"
+  },
+  {
+   "id": "smartrecruiters:Coolblue",
+   "ats": "smartrecruiters",
+   "slug": "Coolblue",
+   "name": "Coolblue",
+   "url": "https://www.coolblue.nl/vacatures",
+   "added": "2026-11-08T16:03:16Z"
+  },
+  {
+   "id": "greenhouse:dept",
+   "ats": "greenhouse",
+   "slug": "dept",
+   "name": "Dept",
+   "url": "https://www.dept.global/careers/",
+   "added": "2026-11-08T16:03:47Z"
+  },
+  {
+   "id": "greenhouse:monks",
+   "ats": "greenhouse",
+   "slug": "monks",
+   "name": "Monks",
+   "url": "https://www.media.monks.com/careers",
+   "added": "2026-11-08T16:04:04Z"
+  }
+ ]
+}

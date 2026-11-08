@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JobRadar</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{--navy:#1E2A3B;--mint:#00C896;--mint-d:#00A87E;--bg:#F7F6F2;--wh:#fff;--mu:#6B7A8D;--bo:#E2E8F0;--red:#DC2626;--amber:#B45309}
+html,body{margin:0;padding:0;min-height:100%;background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(--navy)}
+input,select,button,a,textarea{font-family:inherit}
+a{color:inherit}
+.app{display:flex;min-height:100vh}
+.sb{width:272px;flex-shrink:0;background:var(--navy);padding:24px 18px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.logo{font-weight:800;font-size:20px;color:#fff;margin-bottom:2px}
+.logo span{color:var(--mint)}
+.tag{font-size:10px;color:rgba(255,255,255,.55);font-family:monospace;letter-spacing:1px;margin-bottom:18px}
+.slabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.55);font-family:monospace;margin-bottom:8px}
+.divider{border:none;border-top:1px solid rgba(255,255,255,.1);margin:16px 0}
+.lb,.tb{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;width:100%;border:1px solid rgba(255,255,255,.1);background:transparent;margin-bottom:5px;color:rgba(255,255,255,.75);font-size:13px;text-align:left}
+.lb.act,.tb.act{border-color:rgba(0,200,150,.5);background:rgba(0,200,150,.14);color:#fff}
+.tb{justify-content:flex-start}
+.cnt{font-size:11px;font-family:monospace;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border-radius:10px;padding:2px 8px}
+.chk{width:16px;height:16px;border-radius:4px;flex-shrink:0;border:1.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--navy);font-weight:700}
+.chk.on{background:var(--mint);border-color:transparent}
+.ub-btn{width:100%;margin:2px 0 10px;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.7);font-size:12px;padding:8px;cursor:pointer}
+.fld{margin-bottom:10px}
+.flbl{font-size:10px;color:rgba(255,255,255,.6);font-family:monospace;margin-bottom:4px}
+.fld input,.fld select{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:7px;color:#fff;font-size:13px;padding:8px 10px;outline:none}
+.fld select option{color:var(--navy)}
+.row2{display:flex;gap:8px}
+.row2 .fld{flex:1}
+#btn-find{width:100%;background:var(--mint);color:var(--navy);border:none;border-radius:8px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;margin-top:6px}
+#btn-find:hover{background:var(--mint-d)}
+#btn-find:disabled{opacity:.5;cursor:default}
+#btn-stop{width:100%;background:var(--red);color:#fff;border:none;border-radius:8px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;margin-top:6px;display:none}
+.lastrun{font-size:11px;color:rgba(255,255,255,.55);font-family:monospace;margin-top:10px;line-height:1.5}
+.main{flex:1;padding:24px 28px;max-width:calc(100vw - 272px)}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.mt{font-weight:800;font-size:24px;letter-spacing:-.5px}
+.mt span{color:var(--mint)}
+.mc{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#sort-sel{background:var(--wh);border:1px solid var(--bo);border-radius:8px;color:var(--navy);font-size:12px;padding:6px 12px;cursor:pointer;font-family:monospace;outline:none}
+#vc{font-size:12px;color:var(--mu);font-family:monospace;background:var(--wh);border:1px solid var(--bo);border-radius:20px;padding:5px 14px}
+#sbar{background:var(--wh);border:1px solid var(--bo);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:none;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:var(--mu);font-family:monospace}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bo);border-radius:20px;padding:3px 10px;background:#FAFAFA}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:#CBD5E1}
+.chip.running .dot{background:#F59E0B;animation:pulse 1.2s ease-in-out infinite}
+.chip.done .dot{background:var(--mint)}
+.chip.error .dot{background:var(--red)}
+.chip.off{opacity:.55}
+.chip b{color:var(--navy);font-weight:600}
+#intro{background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.25);border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.7;margin-bottom:14px}
+#links{background:var(--wh);border:1px solid var(--bo);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--mu)}
+#links .lt{font-family:monospace;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+#links .ll{display:flex;flex-wrap:wrap;gap:6px}
+#links a{display:inline-block;border:1px solid var(--bo);border-radius:20px;padding:4px 11px;text-decoration:none;color:var(--navy);font-size:12px;background:#FAFAFA}
+#links a:hover{border-color:var(--mint);background:rgba(0,200,150,.08)}
+#companies{background:var(--wh);border:1px solid var(--bo);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+#companies .lt{font-family:monospace;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--mu);margin-bottom:8px}
+.cp-add{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.cp-add input{flex:1;min-width:220px;border:1px solid var(--bo);border-radius:8px;padding:8px 10px;font-size:13px;outline:none}
+.cp-add button{background:var(--navy);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.cp-msg{font-size:12px;color:var(--mu);margin-bottom:10px;min-height:16px;line-height:1.5}
+.cp-list{display:flex;flex-wrap:wrap;gap:6px}
+.cp-item{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--bo);border-radius:20px;padding:4px 6px 4px 12px;font-size:12px;background:#FAFAFA}
+.cp-item .sys{font-family:monospace;color:var(--mu)}
+.cp-item .err{color:var(--red)}
+.cp-item button{background:none;border:none;color:var(--mu);cursor:pointer;font-size:15px;padding:0 4px;line-height:1}
+#skel{display:none;flex-direction:column;gap:14px}
+.skel-card{background:var(--wh);border:1px solid var(--bo);border-radius:12px;padding:20px 22px}
+.sk{background:#F0F0F0;border-radius:6px;margin-bottom:10px;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+#card-list{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--wh);border:1px solid var(--bo);border-radius:12px;padding:18px 20px}
+.card.new{border-left:4px solid var(--mint)}
+.card.bk{background:#FAFAFA;opacity:.65}
+.ct{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.ci{flex:1;min-width:0}
+.ctitle{font-weight:700;font-size:15px;margin-bottom:3px}
+.ctitle a{text-decoration:none}
+.ctitle a:hover{text-decoration:underline}
+.csub{font-size:13px;color:var(--mu)}
+.cba{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;font-family:monospace;white-space:nowrap}
+.b-mode{background:#E8FBF5;color:#00A87E}
+.b-local{background:#EEF2FF;color:#4338CA}
+.b-emp{background:#F3F4F6;color:#374151}
+.b-new{background:#FFF0F0;color:#DC2626}
+.b-nl{background:#FFF7ED;color:#C2410C}
+.b-reg{background:#FEF2F2;color:#991B1B}
+.b-m1{background:var(--mint);color:var(--navy)}
+.b-m2{background:#FFFBEB;color:#B45309}
+.b-m3{background:#F3F4F6;color:#6B7280}
+.cd{font-size:13px;color:#3E4C5E;line-height:1.6;margin-bottom:12px}
+.cd .more{background:none;border:none;color:var(--mint-d);cursor:pointer;font-size:12px;padding:0 4px}
+.cf{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.cm{display:flex;gap:12px;font-size:12px;color:var(--mu);font-family:monospace;flex-wrap:wrap}
+.cm .why{color:var(--mint-d)}
+.ca{display:flex;gap:8px;flex-wrap:wrap}
+.ca button{background:transparent;color:var(--mu);border:1px solid var(--bo);border-radius:7px;padding:7px 12px;font-size:13px;cursor:pointer}
+.ca .btn-hide{color:var(--red);border-color:#FCA5A5}
+.ca .btn-save.sv{background:#FFFBEB;color:var(--amber);border-color:#F59E0B}
+.ca .btn-app.on{background:#E8FBF5;color:#00A87E;border-color:#00C896}
+.ca .btn-apply{background:var(--navy);color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:13px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+#empty{text-align:center;padding:60px 20px;color:var(--mu);display:none}
+.ei{font-size:40px;margin-bottom:16px}
+.et{font-weight:700;font-size:16px;color:var(--navy);margin-bottom:8px}
+.es{font-size:13px}
+.credit{font-size:11px;color:var(--mu);margin-top:24px;text-align:center;line-height:1.6}
+.credit a{color:var(--mu)}
+@media(max-width:760px){.app{flex-direction:column}.sb{width:100%;height:auto;position:static}.main{max-width:100%;padding:16px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sb">
+    <div class="logo">Job<span>Radar</span></div>
+    <div class="tag">// LIVE JOB SEARCH</div>
+
+    <div class="slabel">My Lists</div>
+    <div id="list-views"></div>
+    <button id="ub-btn" class="ub-btn" style="display:none">Unhide all</button>
+
+    <hr class="divider">
+    <div class="slabel">Show</div>
+    <div id="filter-btns"></div>
+
+    <hr class="divider">
+    <div class="slabel">Your Profile</div>
+    <div class="fld"><div class="flbl">SKILLS (comma separated)</div><input id="inp-skills" placeholder="AI video, content creation, performance marketing"></div>
+    <div class="fld"><div class="flbl">SEARCH TERMS (max 8, add Dutch ones too)</div><input id="inp-keywords" placeholder="content creator, contentmaker, videograaf"></div>
+    <div class="fld"><div class="flbl">SKIP TITLES CONTAINING</div><input id="inp-exclude" placeholder="senior, director, intern"></div>
+    <div class="row2">
+      <div class="fld"><div class="flbl">CITY</div><input id="inp-city" placeholder="Eindhoven"></div>
+      <div class="fld" style="flex:.6"><div class="flbl">RADIUS KM</div><input id="inp-radius" type="number" min="5" max="200" placeholder="40"></div>
+    </div>
+    <div class="fld"><div class="flbl">POSTED WITHIN</div>
+      <select id="inp-days"><option value="7">Last 7 days</option><option value="14">Last 14 days</option><option value="30">Last 30 days</option><option value="60">Last 60 days</option></select>
+    </div>
+    <div id="want-btns"></div>
+    <button id="btn-stop">Stop search</button>
+    <button id="btn-find">Find Jobs</button>
+    <div class="lastrun" id="lastrun"></div>
+  </aside>
+
+  <main class="main">
+    <div class="mh">
+      <div class="mt">Your <span>Matches</span></div>
+      <div class="mc">
+        <select id="sort-sel">
+          <option value="best">Best match first</option>
+          <option value="newest">Newest first</option>
+          <option value="company">Company A to Z</option>
+        </select>
+        <div id="vc"></div>
+      </div>
+    </div>
+    <div id="sbar"></div>
+    <div id="intro"><strong>How it works:</strong> JobRadar pulls live remote roles from Remotive, We Work Remotely, Jobicy and RemoteOK, and jobs near your city from Jooble once its key is in config.json. Every card is a real vacancy and <strong>Apply</strong> opens the original posting. Under <strong>Companies</strong> you can add employers you like; JobRadar then reads their career pages directly. LinkedIn and Indeed do not allow apps to search for you, so the rows below open their search pages with your terms already filled in. Fill in your profile and click <strong>Find Jobs</strong>. Jobs you have not seen before get a green edge and a NEW badge.</div>
+    <div id="links"></div>
+    <div id="companies" style="display:none"></div>
+    <div id="skel">
+      <div class="skel-card"><div class="sk" style="width:55%;height:18px"></div><div class="sk" style="width:30%;height:12px"></div><div class="sk" style="width:100%;height:12px"></div></div>
+      <div class="skel-card"><div class="sk" style="width:45%;height:18px"></div><div class="sk" style="width:35%;height:12px"></div><div class="sk" style="width:100%;height:12px"></div></div>
+      <div class="skel-card"><div class="sk" style="width:60%;height:18px"></div><div class="sk" style="width:25%;height:12px"></div><div class="sk" style="width:90%;height:12px"></div></div>
+    </div>
+    <div id="card-list"></div>
+    <div id="empty">
+      <div class="ei" id="empty-icon"></div>
+      <div class="et" id="empty-title"></div>
+      <div class="es" id="empty-sub"></div>
+    </div>
+    <div class="credit">Remote listings courtesy of <a href="https://remotive.com" target="_blank" rel="noopener">Remotive</a>, <a href="https://remoteok.com" target="_blank" rel="noopener">Remote OK</a>, <a href="https://jobicy.com" target="_blank" rel="noopener">Jobicy</a> and <a href="https://weworkremotely.com" target="_blank" rel="noopener">We Work Remotely</a>. Local listings via the <a href="https://nl.jooble.org" target="_blank" rel="noopener">Jooble</a> API when configured. Apply always opens the original posting.</div>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var S = {
+    profile: {},
+    jobs: [],
+    saved: {},
+    applied: {},
+    hidden: {},
+    sources: {},
+    watchlist: [],
+    watchJobs: [],
+    cpMsg: "",
+    running: false,
+    lastAt: "",
+    message: "",
+    searched: false,
+    view: "all",
+    sort: "best",
+    expanded: {},
+    copied: "",
+    filters: { local: true, remote: true, fulltime: true, contract: true, parttime: true, hideDutch: false, hideDutchReq: false, hideRestricted: true, hideFar: true }
+  };
+  var pollTimer = null;
+  var profileTimer = null;
+
+  // ---- helpers ----
+  function el(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function safeUrl(u) { return /^https?:\/\//i.test(String(u || "")) ? String(u) : "#"; }
+  function api(path, body) {
+    var opts = body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {};
+    return fetch(path, opts).then(function (r) { return r.json(); });
+  }
+  function ageText(j) {
+    var a = j.age_days;
+    if (a === 0) return "today";
+    if (a === 1) return "yesterday";
+    if (a == null || a > 400) return "date unknown";
+    if (a < 14) return a + " days ago";
+    if (a < 60) return Math.round(a / 7) + " weeks ago";
+    return Math.round(a / 30) + " months ago";
+  }
+  function fmtStamp(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString(undefined, { weekday: "short", hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" });
+  }
+  function loadFilters() {
+    try {
+      var f = JSON.parse(localStorage.getItem("jobradar:filters") || "null");
+      if (f && typeof f === "object") for (var k in S.filters) if (k in f) S.filters[k] = !!f[k];
+      var s = localStorage.getItem("jobradar:sort"); if (s) S.sort = s;
+    } catch (e) { }
+  }
+  function saveFilters() {
+    try { localStorage.setItem("jobradar:filters", JSON.stringify(S.filters)); localStorage.setItem("jobradar:sort", S.sort); } catch (e) { }
+  }
+
+  // ---- profile <-> form ----
+  function fillProfile(p) {
+    el("inp-skills").value = (p.skills || []).join(", ");
+    el("inp-keywords").value = (p.keywords || []).join(", ");
+    el("inp-exclude").value = (p.exclude || []).join(", ");
+    el("inp-city").value = p.city || "";
+    el("inp-radius").value = p.radius_km || 40;
+    el("inp-days").value = String(p.days || 30);
+    renderWant();
+  }
+  function readProfile() {
+    return {
+      skills: el("inp-skills").value,
+      keywords: el("inp-keywords").value,
+      exclude: el("inp-exclude").value,
+      city: el("inp-city").value,
+      country: S.profile.country || "Netherlands",
+      radius_km: parseInt(el("inp-radius").value, 10) || 40,
+      days: parseInt(el("inp-days").value, 10) || 30,
+      want_local: S.profile.want_local !== false,
+      want_remote: S.profile.want_remote !== false
+    };
+  }
+  function scheduleProfileSave() {
+    clearTimeout(profileTimer);
+    profileTimer = setTimeout(function () {
+      api("/api/profile", readProfile()).then(function (r) { if (r && r.profile) { S.profile = r.profile; renderLinks(); } });
+    }, 700);
+  }
+
+  // ---- job lists ----
+  function jobById(id) {
+    for (var i = 0; i < S.jobs.length; i++) if (S.jobs[i].id === id) return S.jobs[i];
+    return S.saved[id] || null;
+  }
+  function passesFilters(j) {
+    var f = S.filters;
+    if (j.mode === "remote" && !f.remote) return false;
+    if (j.mode !== "remote" && !f.local) return false;
+    if (j.employment === "full-time" && !f.fulltime) return false;
+    if (j.employment === "contract" && !f.contract) return false;
+    if (j.employment === "part-time" && !f.parttime) return false;
+    if (f.hideDutch && j.lang === "nl") return false;
+    if (f.hideDutchReq && j.english === "dutch-required") return false;
+    if (f.hideRestricted && j.region_ok === false) return false;
+    if (f.hideFar && j.mode !== "remote" && j.km != null && j.km > (parseInt(S.profile.radius_km, 10) || 40)) return false;
+    return true;
+  }
+  function displayList() {
+    var list;
+    if (S.view === "saved") {
+      list = Object.keys(S.saved).map(function (id) { return jobById(id) || S.saved[id]; });
+    } else if (S.view === "hidden") {
+      list = S.jobs.filter(function (j) { return S.hidden[j.id]; });
+    } else if (S.view === "companies") {
+      list = S.watchJobs.filter(function (j) { return !S.hidden[j.id] && passesFilters(j); });
+    } else {
+      list = S.jobs.filter(function (j) { return !S.hidden[j.id] && !j.excluded && passesFilters(j); });
+    }
+    list = list.slice();
+    if (S.sort === "newest") list.sort(function (a, b) { return (a.age_days - b.age_days) || (b.score - a.score); });
+    else if (S.sort === "company") list.sort(function (a, b) { return String(a.company).localeCompare(String(b.company)); });
+    else list.sort(function (a, b) { return (b.score - a.score) || (a.age_days - b.age_days); });
+    return list;
+  }
+
+  // ---- render: sidebar ----
+  function renderSidebar() {
+    var all = S.jobs.filter(function (j) { return !S.hidden[j.id] && !j.excluded && passesFilters(j); }).length;
+    var savedCount = Object.keys(S.saved).length;
+    var hiddenCount = Object.keys(S.hidden).length;
+    var views = [
+      { id: "all", label: "All matches", count: all },
+      { id: "saved", label: "Saved", count: savedCount },
+      { id: "companies", label: "Companies", count: S.watchlist.length },
+      { id: "hidden", label: "Hidden", count: hiddenCount }
+    ];
+    el("list-views").innerHTML = views.map(function (v) {
+      return '<button class="lb' + (S.view === v.id ? " act" : "") + '" data-view="' + v.id + '"><span>' + v.label + '</span><span class="cnt">' + v.count + '</span></button>';
+    }).join("");
+    var ub = el("ub-btn");
+    ub.style.display = hiddenCount ? "block" : "none";
+    ub.textContent = "Unhide all (" + hiddenCount + ")";
+
+    var defs = [
+      { id: "local", label: "Local / hybrid near " + (S.profile.city || "your city") },
+      { id: "remote", label: "Remote" },
+      { id: "fulltime", label: "Full-time" },
+      { id: "contract", label: "Freelance / contract" },
+      { id: "parttime", label: "Part-time" },
+      { id: "hideDutch", label: "Hide Dutch-language postings" },
+      { id: "hideDutchReq", label: "Hide jobs that require Dutch" },
+      { id: "hideRestricted", label: "Hide jobs limited to other regions" },
+      { id: "hideFar", label: "Hide local jobs beyond " + (parseInt(S.profile.radius_km, 10) || 40) + " km" }
+    ];
+    el("filter-btns").innerHTML = defs.map(function (d) {
+      var on = !!S.filters[d.id];
+      return '<button class="tb' + (on ? " act" : "") + '" data-filter="' + d.id + '"><div class="chk' + (on ? " on" : "") + '">' + (on ? "&#10003;" : "") + '</div>' + esc(d.label) + '</button>';
+    }).join("");
+
+    el("btn-find").style.display = S.running ? "none" : "block";
+    el("btn-stop").style.display = S.running ? "block" : "none";
+    el("lastrun").textContent = S.lastAt ? "Last search: " + fmtStamp(S.lastAt) : "No search yet";
+  }
+  function renderWant() {
+    var defs = [
+      { id: "want_local", label: "Jobs near " + (el("inp-city").value || "my city") },
+      { id: "want_remote", label: "Remote jobs" }
+    ];
+    el("want-btns").innerHTML = '<div class="flbl">SEARCH FOR</div>' + defs.map(function (d) {
+      var on = S.profile[d.id] !== false;
+      return '<button class="tb' + (on ? " act" : "") + '" data-want="' + d.id + '"><div class="chk' + (on ? " on" : "") + '">' + (on ? "&#10003;" : "") + '</div>' + esc(d.label) + '</button>';
+    }).join("");
+  }
+
+  // ---- render: status + links ----
+  function renderStatus() {
+    var bar = el("sbar");
+    var names = Object.keys(S.sources);
+    if (!names.length && !S.message) { bar.style.display = "none"; return; }
+    var h = "";
+    if (S.message) h += '<span><b>' + esc(S.message) + '</b></span>';
+    h += names.map(function (n) {
+      var s = S.sources[n] || {};
+      var txt = s.status === "done" ? s.count + " jobs" : s.status === "error" ? "problem" : s.status === "off" ? "off" : s.status === "running" ? (s.msg || "working") : "waiting";
+      return '<span class="chip ' + esc(s.status || "") + '" title="' + esc(s.msg || "") + '"><span class="dot"></span><b>' + esc(n) + '</b> ' + esc(txt) + '</span>';
+    }).join("");
+    var errs = names.filter(function (n) { return S.sources[n] && S.sources[n].status === "error"; });
+    if (errs.length) h += '<span style="width:100%;color:#991B1B">' + errs.map(function (n) { return esc(n) + ": " + esc(S.sources[n].msg); }).join(" | ") + '</span>';
+    bar.innerHTML = h;
+    bar.style.display = "flex";
+  }
+  function renderLinks() {
+    var p = S.profile || {};
+    var terms = (p.keywords && p.keywords.length ? p.keywords : p.skills || []).slice(0, 5);
+    var q = terms[0] || "content creator";
+    var city = p.city || "Eindhoven";
+    var days = parseInt(p.days, 10) || 30;
+    var tpr = "&f_TPR=r" + (Math.min(days, 30) * 86400) + "&sortBy=DD";
+    var eq = encodeURIComponent(q), ec = encodeURIComponent(city);
+    var li = [];
+    terms.forEach(function (t) {
+      var et = encodeURIComponent(t);
+      li.push([t + " near " + city, "https://www.linkedin.com/jobs/search/?keywords=" + et + "&location=" + encodeURIComponent(city + ", " + (p.country || "Netherlands")) + "&distance=25" + tpr]);
+      li.push([t + " remote", "https://www.linkedin.com/jobs/search/?keywords=" + et + "&location=" + encodeURIComponent(p.country || "Netherlands") + "&f_WT=2" + tpr]);
+    });
+    var links = [
+      ["Indeed NL", "https://nl.indeed.com/jobs?q=" + eq + "&l=" + ec + "&radius=50&fromage=7"],
+      ["StepStone", "https://www.stepstone.nl/vacatures/" + encodeURIComponent(q.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")) + "/in-" + encodeURIComponent(city.toLowerCase().replace(/[^a-z0-9]+/g, "-"))],
+      ["Nationale Vacaturebank", "https://www.nationalevacaturebank.nl/vacature/zoeken?query=" + eq + "&location=" + ec + "&distance=30"],
+      ["Glassdoor", "https://www.glassdoor.nl/Job/index.htm?sc.keyword=" + eq],
+      ["Malt (freelance)", "https://www.malt.com/en-nl/s?q=" + eq],
+      ["Contra (freelance)", "https://contra.com/search?q=" + eq],
+      ["PeoplePerHour", "https://www.peopleperhour.com/freelance-jobs?keyword=" + eq]
+    ];
+    var gj = [];
+    terms.forEach(function (t) {
+      gj.push([t + " near " + city, "https://www.google.com/search?q=" + encodeURIComponent(t + " " + city) + "&ibp=htl;jobs"]);
+      gj.push([t + " remote", "https://www.google.com/search?q=" + encodeURIComponent(t + " remote " + (p.country || "Netherlands")) + "&ibp=htl;jobs"]);
+    });
+    var ag = [
+      ["Randstad", "https://www.randstad.nl/vacatures?zoekterm=" + eq + "&locatie=" + encodeURIComponent(city.toLowerCase()) + "&afstand=30"],
+      ["Tempo-Team", "https://www.tempo-team.nl/vacatures/?zoekterm=" + eq + "&locatie=" + ec],
+      ["YoungCapital", "https://www.youngcapital.nl/vacatures?search=" + eq + "&location=" + ec],
+      ["Michael Page", "https://www.michaelpage.nl/jobs?keywords=" + eq + "&location=" + ec],
+      ["Start People", "https://www.startpeople.nl/vacatures"],
+      ["Unique", "https://www.unique.nl/vacatures"],
+      ["Hays", "https://www.hays.nl/vacatures"],
+      ["Manpower", "https://www.manpower.nl/nl/zoek-vacatures"],
+      ["Adecco", "https://www.adecco.com/nl-nl/vacatures"],
+      ["Olympia", "https://www.olympia.nl/vacatures"],
+      ["Robert Half", "https://www.roberthalf.com/nl/nl/vacatures"]
+    ];
+    function row(items) { return '<div class="ll">' + items.map(function (l) { return '<a href="' + esc(l[1]) + '" target="_blank" rel="noopener">' + esc(l[0]) + '</a>'; }).join("") + '</div>'; }
+    el("links").innerHTML = '<div class="lt">LinkedIn searches, newest first (one click each)</div>' + row(li)
+      + '<div class="lt" style="margin-top:10px">Google Jobs, which also collects LinkedIn, Indeed and company sites</div>' + row(gj)
+      + '<div class="lt" style="margin-top:10px">Staffing agencies (uitzendbureaus). Randstad and Tempo-Team are also searched automatically; the first four open with "' + esc(q) + '" filled in</div>' + row(ag)
+      + '<div class="lt" style="margin-top:10px">Other boards, searching "' + esc(q) + '"</div>' + row(links);
+  }
+  function renderCompanies() {
+    var items = S.watchlist.map(function (c) {
+      var info = c.count == null ? "not read yet" : c.err ? '<span class="err">' + esc(c.err) + '</span>' : c.count + " open";
+      return '<span class="cp-item"><b>' + esc(c.name) + '</b><span class="sys">' + esc(c.system || "") + ' · ' + info + '</span><button data-action="watch-remove" data-id="' + esc(c.id) + '" title="Remove from the list">×</button></span>';
+    }).join("");
+    el("companies").innerHTML = '<div class="lt">Companies you watch. JobRadar reads their career pages directly, so new postings show up here first.</div>'
+      + '<div class="cp-add"><input id="cp-url" placeholder="Paste the careers page of a company, e.g. https://careers.example.com"><button data-action="watch-add">Add company</button></div>'
+      + '<div class="cp-msg">' + esc(S.cpMsg || "Works for career pages built on Recruitee, Greenhouse, Lever, Workable, Ashby, Personio, Teamtailor or SmartRecruiters, which covers most Dutch agencies, scale-ups and web shops. Every open position of these companies is listed below; the ones that fit your profile also appear under All matches.") + '</div>'
+      + '<div class="cp-list">' + (items || '<span class="cp-msg">No companies yet.</span>') + '</div>';
+  }
+  function addCompany() {
+    var inp = el("cp-url");
+    var url = (inp && inp.value || "").trim();
+    if (!url) return;
+    S.cpMsg = "Checking " + url + " … this takes a few seconds.";
+    renderCompanies();
+    api("/api/watch/add", { url: url }).then(function (r) {
+      S.cpMsg = r.ok ? "Added " + r.company.name + " (" + r.system + ", " + r.count + " open positions). Reading all companies now…" : r.message;
+      refreshState().then(function () { if (r.ok) startSearch(); });
+    }).catch(function () { S.cpMsg = "Could not reach the JobRadar server."; renderCompanies(); });
+  }
+
+  // ---- render: cards ----
+  function badgeFor(j) {
+    var b = "";
+    var m = j.score || 0;
+    var why = (j.breakdown && j.breakdown.length) ? j.breakdown.join("\n") : "Hover shows how the score was built after the next search.";
+    b += '<span class="badge ' + (m >= 60 ? "b-m1" : m >= 30 ? "b-m2" : "b-m3") + '" title="' + esc(why) + '">' + m + '% match</span>';
+    if (j.mode === "remote") b += '<span class="badge b-mode">Remote</span>';
+    else b += '<span class="badge b-local">Local</span>';
+    if (j.employment) b += '<span class="badge b-emp">' + esc(j.employment) + '</span>';
+    if (j.is_new) b += '<span class="badge b-new">NEW</span>';
+    if (j.lang === "nl") b += '<span class="badge b-nl" title="The posting is written in Dutch">Dutch</span>';
+    if (j.english === "english-ok") b += '<span class="badge b-mode" title="The posting says English is fine">English OK</span>';
+    if (j.english === "dutch-required") b += '<span class="badge b-reg" title="The posting asks for Dutch">Dutch required</span>';
+    if (j.region_ok === false) b += '<span class="badge b-reg" title="' + esc(j.region) + '">Limited to ' + esc(j.region) + '</span>';
+    return b;
+  }
+  function cardHtml(j) {
+    var hidden = !!S.hidden[j.id];
+    var saved = !!S.saved[j.id];
+    var applied = !!S.applied[j.id];
+    var full = j.desc || "";
+    var open = !!S.expanded[j.id];
+    var short = full.length > 280 && !open ? full.slice(0, 280) + "…" : full;
+    var desc = full ? '<div class="cd">' + esc(short) + (full.length > 280 ? ' <button class="more" data-action="more" data-id="' + esc(j.id) + '">' + (open ? "less" : "more") + '</button>' : "") + '</div>'
+      : '<div class="cd" style="color:var(--mu)">No description in the listing. Open it on ' + esc(j.source) + ' to read the full posting.</div>';
+    var meta = '<span>' + esc(j.location || "") + '</span>';
+    if (j.km != null) meta += '<span title="Distance from ' + esc(S.profile.city || "your city") + ' to the nearest named place">' + j.km + ' km away</span>';
+    meta += '<span>' + esc(ageText(j)) + (j.posted ? " (" + esc(j.posted) + ")" : "") + '</span>';
+    if (j.salary) meta += '<span>' + esc(j.salary) + '</span>';
+    if (j.reasons && j.reasons.length) meta += '<span class="why">matches: ' + esc(j.reasons.join(", ")) + '</span>';
+    var actions;
+    if (hidden) {
+      actions = '<button data-action="unhide" data-id="' + esc(j.id) + '">Unhide</button>';
+    } else {
+      actions = '<button class="btn-hide" data-action="hide" data-id="' + esc(j.id) + '">Hide</button>'
+        + '<button class="btn-save' + (saved ? " sv" : "") + '" data-action="save" data-id="' + esc(j.id) + '">' + (saved ? "★ Saved" : "☆ Save") + '</button>'
+        + (saved ? '<button class="btn-app' + (applied ? " on" : "") + '" data-action="applied" data-id="' + esc(j.id) + '">' + (applied ? "✓ Applied" : "Mark applied") + '</button>' : "")
+        + '<button data-action="copy" data-id="' + esc(j.id) + '" title="Copy title, company, link and description, for example to draft a cover letter">' + (S.copied === j.id ? "✓ Copied" : "Copy") + '</button>'
+        + '<a href="' + esc(safeUrl(j.url)) + '" target="_blank" rel="noopener" class="btn-apply">Apply on ' + esc(j.source) + ' ↗</a>';
+    }
+    return '<div class="card' + (hidden ? " bk" : "") + (j.is_new && !hidden ? " new" : "") + '" data-card-id="' + esc(j.id) + '">'
+      + '<div class="ct"><div class="ci"><div class="ctitle"><a href="' + esc(safeUrl(j.url)) + '" target="_blank" rel="noopener">' + esc(j.title) + '</a></div>'
+      + '<div class="csub">' + esc(j.company) + ' · via ' + esc(j.source) + '</div></div>'
+      + '<div class="cba">' + badgeFor(j) + '</div></div>'
+      + desc
+      + '<div class="cf"><div class="cm">' + meta + '</div><div class="ca">' + actions + '</div></div></div>';
+  }
+  function renderCards() {
+    var list = displayList();
+    var total = S.view === "companies" ? S.watchJobs.length : S.jobs.length;
+    el("intro").style.display = (!S.searched && !S.running && S.view === "all") ? "block" : "none";
+    el("links").style.display = S.view === "companies" ? "none" : "block";
+    el("companies").style.display = S.view === "companies" ? "block" : "none";
+    el("skel").style.display = S.running ? "flex" : "none";
+    var vc = el("vc");
+    if (total) {
+      var ex = S.jobs.filter(function (j) { return j.excluded; }).length;
+      vc.textContent = list.length + " shown of " + total + (ex ? " (" + ex + " skipped by your words)" : "");
+      vc.style.display = "block";
+    } else vc.style.display = "none";
+
+    var cardEl = el("card-list");
+    if (!S.running && list.length) {
+      cardEl.style.display = "flex";
+      cardEl.innerHTML = list.map(cardHtml).join("");
+    } else {
+      cardEl.style.display = "none";
+      cardEl.innerHTML = "";
+    }
+    var emptyEl = el("empty");
+    if (!S.running && !list.length && (S.searched || S.view !== "all")) {
+      emptyEl.style.display = "block";
+      var v = S.view, hasCo = S.watchlist.length > 0;
+      el("empty-icon").textContent = v === "saved" ? "★" : v === "hidden" ? "⊘" : v === "companies" ? "⌂" : "◎";
+      el("empty-title").textContent = v === "saved" ? "No saved jobs yet" : v === "hidden" ? "Nothing hidden" : v === "companies" ? (hasCo ? "No open positions loaded yet" : "No companies on the list yet") : "No matches with these filters";
+      el("empty-sub").textContent = v === "saved" ? "Click Save on any job to keep it here" : v === "hidden" ? "Jobs you hide land here" : v === "companies" ? (hasCo ? "Click Find Jobs to read their career pages" : "Paste the careers page of a company you like above") : "Loosen the filters on the left, add search terms, or widen the radius and search again";
+    } else emptyEl.style.display = "none";
+  }
+  function renderAll() { renderSidebar(); renderStatus(); renderLinks(); renderCompanies(); renderCards(); }
+
+  // ---- search ----
+  function startSearch() {
+    if (S.running) return;
+    S.running = true; S.searched = true; S.view = "all"; S.message = "Starting search…"; S.sources = {};
+    renderAll();
+    api("/api/search", readProfile()).then(function (r) {
+      if (!r.ok && r.message !== "already running") { S.running = false; S.message = "Could not start: " + (r.message || "unknown error"); renderAll(); return; }
+      poll();
+    }).catch(function () { S.running = false; S.message = "JobRadar server not reachable. Is the black window still open?"; renderAll(); });
+  }
+  function poll() {
+    clearTimeout(pollTimer);
+    api("/api/search/status").then(function (st) {
+      S.sources = st.sources || {};
+      S.message = st.message || "";
+      if (st.running) {
+        S.running = true;
+        renderStatus(); renderSidebar();
+        pollTimer = setTimeout(poll, 800);
+      } else {
+        S.running = false;
+        S.jobs = st.jobs || [];
+        S.lastAt = st.at || S.lastAt;
+        S.searched = true;
+        refreshState();
+      }
+    }).catch(function () { pollTimer = setTimeout(poll, 1500); });
+  }
+  function stopSearch() {
+    S.message = "Stopping…"; renderStatus();
+    api("/api/search/stop", {});
+  }
+  function refreshState() {
+    return api("/api/state").then(function (st) {
+      S.profile = st.profile || {};
+      S.saved = st.saved || {};
+      S.applied = st.applied || {};
+      S.hidden = st.hidden || {};
+      S.watchlist = st.watchlist || [];
+      S.watchJobs = st.watch_jobs || [];
+      if (st.last && st.last.jobs) { S.jobs = st.last.jobs; S.lastAt = st.last.at || ""; S.searched = !!st.last.at; }
+      if (st.search) {
+        S.sources = st.search.sources || {};
+        S.message = st.search.message || "";
+        S.running = !!st.search.running;
+      }
+      renderAll();
+      if (S.running) poll();
+    });
+  }
+
+  // ---- actions ----
+  function copyJob(j) {
+    var text = j.title + "\n" + j.company + (j.location ? " · " + j.location : "") + " · via " + j.source
+      + (j.posted ? " · posted " + j.posted : "") + (j.salary ? " · " + j.salary : "") + "\n" + j.url + "\n\n"
+      + (j.desc || "(no description in the listing, see the link)") + "\n";
+    var done = function (ok) {
+      S.copied = ok ? j.id : "";
+      renderCards();
+      setTimeout(function () { S.copied = ""; renderCards(); }, 1500);
+    };
+    var fallback = function () {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.left = "-1000px";
+      document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      done(ok);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+    else fallback();
+  }
+  function act(action, id) {
+    var j = jobById(id);
+    if (action === "more") { S.expanded[id] = !S.expanded[id]; renderCards(); return; }
+    if (action === "copy") { if (j) copyJob(j); return; }
+    if (action === "save") { api("/api/job/save", { id: id, job: j }).then(refreshState); }
+    if (action === "applied") { api("/api/job/applied", { id: id, job: j }).then(refreshState); }
+    if (action === "hide") { api("/api/job/hide", { id: id }).then(refreshState); }
+    if (action === "unhide") { api("/api/job/unhide", { id: id }).then(refreshState); }
+  }
+
+  // ---- wiring ----
+  el("btn-find").addEventListener("click", startSearch);
+  el("btn-stop").addEventListener("click", stopSearch);
+  el("ub-btn").addEventListener("click", function () { api("/api/job/unhide_all", {}).then(refreshState); });
+  el("sort-sel").addEventListener("change", function () { S.sort = this.value; saveFilters(); renderCards(); });
+  el("list-views").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-view]"); if (b) { S.view = b.getAttribute("data-view"); renderAll(); }
+  });
+  el("filter-btns").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-filter]"); if (!b) return;
+    var k = b.getAttribute("data-filter"); S.filters[k] = !S.filters[k]; saveFilters(); renderSidebar(); renderCards();
+  });
+  el("want-btns").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-want]"); if (!b) return;
+    var k = b.getAttribute("data-want"); S.profile[k] = S.profile[k] === false; renderWant(); scheduleProfileSave();
+  });
+  el("card-list").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-action]"); if (!b) return;
+    act(b.getAttribute("data-action"), b.getAttribute("data-id"));
+  });
+  el("companies").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-action]"); if (!b) return;
+    var a = b.getAttribute("data-action");
+    if (a === "watch-add") addCompany();
+    if (a === "watch-remove") api("/api/watch/remove", { id: b.getAttribute("data-id") }).then(function () { S.cpMsg = ""; refreshState(); });
+  });
+  el("companies").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && e.target && e.target.id === "cp-url") { e.preventDefault(); addCompany(); }
+  });
+  ["inp-skills", "inp-keywords", "inp-exclude", "inp-city", "inp-radius", "inp-days"].forEach(function (id) {
+    el(id).addEventListener("input", function () { if (id === "inp-city") renderWant(); scheduleProfileSave(); });
+    el(id).addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); startSearch(); } });
+  });
+
+  // ---- init ----
+  loadFilters();
+  el("sort-sel").value = S.sort;
+  api("/api/state").then(function (st) {
+    S.profile = st.profile || {};
+    fillProfile(S.profile);
+    S.saved = st.saved || {}; S.applied = st.applied || {}; S.hidden = st.hidden || {};
+    S.watchlist = st.watchlist || []; S.watchJobs = st.watch_jobs || [];
+    if (st.last && st.last.jobs && st.last.jobs.length) { S.jobs = st.last.jobs; S.lastAt = st.last.at || ""; S.searched = true; S.sources = st.last.sources || {}; S.message = "Results from your last search"; }
+    if (st.search && st.search.running) { S.running = true; S.sources = st.search.sources || {}; S.message = st.search.message || ""; }
+    renderAll();
+    if (S.running) poll();
+  }).catch(function () {
+    S.message = "JobRadar server not reachable. Start it with the Start JobRadar script and reload this page.";
+    renderAll();
+  });
+})();
+</script>
+</body>
+</html>

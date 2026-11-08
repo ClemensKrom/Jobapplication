@@ -1,0 +1,12 @@
+# Personal data created by the app: settings, saved jobs, seen history, feed cache
+jobradar_data.json
+jobradar_cache.json
+# API keys
+config.json
+# Build output and Python leftovers
+dist/
+build/
+*.spec
+__pycache__/
+*.pyc
+*.tmp
